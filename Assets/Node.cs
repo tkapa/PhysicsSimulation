@@ -10,7 +10,7 @@ public class Node : MonoBehaviour {
     Vector3 moveTo = new Vector3(3, 0, 0);
 
     private void Update()
-    {
+    {/*
         if (isAnchor)
         {
             if (isPos)
@@ -27,6 +27,6 @@ public class Node : MonoBehaviour {
                 if (this.transform.position == -moveTo)
                     isPos = true;
             }
-        }
+        }*/
     }
 }

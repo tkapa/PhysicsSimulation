@@ -5,7 +5,8 @@ using UnityEngine;
 public class VerletManager : MonoBehaviour {
 
     public GameObject[] nodes;
-    Vector3 g = new Vector3(0, 5.8f, 0);
+    public Vector3[] previousPositions;
+    Vector3 g = new Vector3(0, -20f, 0);
     bool switchDir;
 
     Vector3 orego1Temp;
@@ -15,27 +16,33 @@ public class VerletManager : MonoBehaviour {
     private void Start()
     {
         nodes = GameObject.FindGameObjectsWithTag("Player");
+        previousPositions = new Vector3[nodes.Length];
+
+        for (int i = 0; i < nodes.Length; ++i)
+            previousPositions[i] = nodes[i].transform.position;
+
         switchDir = false;
         orego1Temp = nodes[0].transform.position;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        orego1Temp = nodes[0].transform.position;
-
-       if (!switchDir)
-       {
-            for (int ite = 0; ite < nodes.Length - 1; ++ite)            
-                ConstrainObjects(ref nodes[ite], ref nodes[ite + 1], 1.5f, 0.99f, 0.99f);
-                         
-
-            switchDir = true;
-        } else if (switchDir)
+        for(int i = 0; i < 10; ++i)
         {
-            for ( int ite = nodes.Length; ite < 1; --ite)            
-                ConstrainObjects(ref nodes[ite], ref nodes[ite - 1], 1.5f, 0.99f, 0.99f);               
+            for (int ite = 0; ite < nodes.Length - 1; ++ite)
+                ConstrainObjects(ref nodes[ite], ref nodes[ite + 1], 1.5f, 0.5f, 0.5f);
+        }
+            
 
-            switchDir = false;
+
+       for(int i = 0; i< nodes.Length; ++i)
+        {
+            if (!nodes[i].GetComponent<Node>().isAnchor)
+            {
+                Vector3 temp = nodes[i].transform.position;
+                nodes[i].transform.position = 1.99f * nodes[i].transform.position  - previousPositions[i]*0.99f + g * (Time.deltaTime * Time.deltaTime);
+                previousPositions[i] = temp;
+            }            
         }
     }
 
@@ -44,7 +51,6 @@ public class VerletManager : MonoBehaviour {
         Vector3 delta = p2.transform.position - p1.transform.position;
         
         float deltLeng = (float)Mathf.Sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
-        delta -= g;
 
         float diff = (deltLeng - min) / deltLeng;
 
